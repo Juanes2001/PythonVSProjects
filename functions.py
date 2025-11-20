@@ -25,17 +25,25 @@ e0 = 8.854e-12
 
 
 r = CoordSys3D('r')
+k = CoordSys3D('k')
 E = CoordSys3D('E')
 Ax,Ay,phix,phiy,t = sp.symbols('Ax Ay phix phiy t')
 
 # Definición en forma simbólica de la forma incial de la onda electromagnética la cual tendremos que solucionar en sus variables.
 
-def Evec(t,omega,k):
+def Evec(t,omega,k_vec):
 
-    phase = sp.exp(sp.I*(r.dot(k)-omega*t))
+    phase = sp.exp(-sp.I*(r.dot(k_vec)+omega*t))
     E0_vec = Ax*sp.exp(sp.I*(phix))*E.i + Ay*sp.exp(sp.I*(phiy))*E.j 
 
     return E0_vec * phase
+
+# Definición en forma simbólica del operador curl. curl
+
+def curl_curl(E_vec):
+
+    return vec.curl(vec.curl(E_vec))
+
 
 
 
