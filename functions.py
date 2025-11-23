@@ -22,27 +22,51 @@ u0r = 1
 u0 = 4*math.pi* 10e-7
 e0r = 1
 e0 = 8.854e-12 
+p = 10e-9
+q = 2*math.pi/p
+
+## Parametros de entrada
+delta_ab = 0.001
+epsilon_ab = 1.41**2
 
 
 r = CoordSys3D('r')
-k = CoordSys3D('k')
 E = CoordSys3D('E')
-Ax,Ay,phix,phiy,t = sp.symbols('Ax Ay phix phiy t')
+z,t = sp.symbols('z t')
+Ax = sp.Function("Ax")
+Ay = sp.Function("Ay")
+
+er_tensor = sp.Matrix([[epsilon_ab + delta_ab*sp.cos(2*q*z), -delta_ab*sp.sin(2*q*z)],
+                       [-delta_ab*sp.sin(2*q*z), epsilon_ab - delta_ab*sp.cos(2*q*z)]])
 
 # Definición en forma simbólica de la forma incial de la onda electromagnética la cual tendremos que solucionar en sus variables.
 
-def Evec(t,omega,k_vec):
+def Evec(t,omega,r_vec,k_vec):
 
-    phase = sp.exp(-sp.I*(r.dot(k_vec)+omega*t))
-    E0_vec = Ax*sp.exp(sp.I*(phix))*E.i + Ay*sp.exp(sp.I*(phiy))*E.j 
+    temporal_phase = sp.exp(sp.I*(omega*t))
+    E0_vec = (Ax(z)*E.i + Ay(z)*E.j)*sp.exp(-sp.I*(r_vec.dot(k_vec)))
 
-    return E0_vec * phase
+    return E0_vec * temporal_phase
 
-# Definición en forma simbólica del operador curl. curl
+# Definición en forma simbólica del operador rotacion S(theta)
 
-def curl_curl(E_vec):
+def S(phi):# al ser un input negativo obtenemos S-1,no necesitamos definirlo aparte
 
-    return vec.curl(vec.curl(E_vec))
+    matr = sp.Matrix( [[sp.cos(phi), sp.sin(phi)],
+                       [-sp.sin(phi), sp.cos(phi)]] )
+    return matr
+
+def Matx_vec_mult(M,V):
+
+    M = sp.sympify(M)
+    V = sp.sympify(V)
+
+    vec_matr =  sp.Matrix(V.to_matrix(r))
+
+    mult = M * vec_matr
+    re_vec = mult[0]*r.i + mult[1]*r.j + mult[2]*r.k 
+
+    return re_vec
 
 
 
