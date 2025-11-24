@@ -68,6 +68,8 @@ def Matx_vec_mult(M,V):
 
     return re_vec
 
+def solve(A,):
+
 
 
 
