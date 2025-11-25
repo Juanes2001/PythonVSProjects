@@ -24,33 +24,66 @@ e0r = 1
 e0 = 8.854e-12 
 p = 10e-9
 q = 2*math.pi/p
+c = 299792458
 
 ## Parametros de entrada
 delta_ab = 0.001
 epsilon_ab = 1.41**2
+lambda0 = 500E-9
+k0 = 2*math.pi / lambda0
+alf = lambda0/p
+
+
+nx = math.sqrt(epsilon_ab+delta_ab)
+ny = math.sqrt(epsilon_ab-delta_ab)
 
 
 r = CoordSys3D('r')
-E = CoordSys3D('E')
 z,t = sp.symbols('z t')
 Ax = sp.Function("Ax")
 Ay = sp.Function("Ay")
 
-er_tensor = sp.Matrix([[epsilon_ab + delta_ab*sp.cos(2*q*z), -delta_ab*sp.sin(2*q*z)],
-                       [-delta_ab*sp.sin(2*q*z), epsilon_ab - delta_ab*sp.cos(2*q*z)]])
+# Con esta funcion definimos los autovalores dependientes del valor de lambda
+def N_(lam,type,dir):
 
-# Definición en forma simbólica de la forma incial de la onda electromagnética la cual tendremos que solucionar en sus variables.
+    if type == 1 and dir == 1:
+        auto_vals = + ((lam/p)**2 + epsilon_ab + 
+                          math.sqrt(4*(lam/p)**2 * epsilon_ab + delta_ab**2))**(0.5) + 1j*0
+    elif type == 1 and dir == -1:
+        auto_vals = - ((lam/p)**2 + epsilon_ab + 
+                          math.sqrt(4*(lam/p)**2 * epsilon_ab + delta_ab**2))**(0.5) + 1j*0
+    elif type == 2 and dir == 1:
+        auto_vals = + ((lam/p)**2 + epsilon_ab - 
+                          math.sqrt(4*(lam/p)**2 * epsilon_ab + delta_ab**2))**(0.5) + 1j*0
+    elif type == 2 and dir == -1:
+        auto_vals = - ((lam/p)**2 + epsilon_ab - 
+                          math.sqrt(4*(lam/p)**2 * epsilon_ab + delta_ab**2))**(0.5) + 1j*0
+    return auto_vals
 
-def Evec(t,omega,r_vec,k_vec):
+
+# Definimos con esta funcion los autovectores representativos como base
+# dependientes del valor que adopte n como entrada
+def A_0(n):
+
+    A0_vec = ((1*r.i + -sp.I * (nx**2-n**2-(alf)**2)/(2*alf*n)*r.j)
+                *sp.exp(-sp.I*(z*k0*n)))
+
+    return A0_vec 
+
+# Definición en forma simbólica de la forma incial de la onda electromagnética 
+# incidente
+
+def Evec(t,omega):
 
     temporal_phase = sp.exp(sp.I*(omega*t))
-    E0_vec = (Ax(z)*E.i + Ay(z)*E.j)*sp.exp(-sp.I*(r_vec.dot(k_vec)))
+    E0_vec = (Ax(z)*r.i + Ay(z)*r.j)*sp.exp(-sp.I*(z*k0))
 
     return E0_vec * temporal_phase
 
 # Definición en forma simbólica del operador rotacion S(theta)
 
-def S(phi):# al ser un input negativo obtenemos S-1,no necesitamos definirlo aparte
+def S(phi):
+    # al ser el input negativo obtenemos S-1,no necesitamos definirlo aparte
 
     matr = sp.Matrix( [[sp.cos(phi), sp.sin(phi)],
                        [-sp.sin(phi), sp.cos(phi)]] )
@@ -67,9 +100,6 @@ def Matx_vec_mult(M,V):
     re_vec = mult[0]*r.i + mult[1]*r.j + mult[2]*r.k 
 
     return re_vec
-
-def solve(A,):
-
 
 
 
