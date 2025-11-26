@@ -13,4 +13,12 @@ import math
 
 
 
-A_vec_in = fun.Evec(0,omega = 2*math.pi*fun.c/fun.lambda0)
+Ax = sp.int(1)
+Ay = -sp.I
+
+# Onda incidente y onda reflejada
+E_vec_i = 1/math.sqrt(2)*fun.Evec(Ax,Ay,0,omega = 2*math.pi*fun.c/fun.lambda0,dir = 1)
+E_vec_r = 1/math.sqrt(2)*fun.Evec(Ax,-Ay,0,omega = 2*math.pi*fun.c/fun.lambda0, dir = -1)
+
+# 
+

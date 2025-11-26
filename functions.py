@@ -40,8 +40,6 @@ ny = math.sqrt(epsilon_ab-delta_ab)
 
 r = CoordSys3D('r')
 z,t = sp.symbols('z t')
-Ax = sp.Function("Ax")
-Ay = sp.Function("Ay")
 
 # Con esta funcion definimos los autovalores dependientes del valor de lambda
 def N_(lam,type,dir):
@@ -73,12 +71,23 @@ def Aprime_0(n):
 # Definición en forma simbólica de la forma incial de la onda electromagnética 
 # incidente
 
-def Evec(t,omega):
+def Evec(Ax,Ay,t,omega,dir):
 
     temporal_phase = sp.exp(sp.I*(omega*t))
-    E0_vec = (Ax(z)*r.i + Ay(z)*r.j)*sp.exp(-sp.I*(z*k0))
-
+    if dir == +1:    
+        E0_vec = (Ax*r.i + Ay*r.j)*sp.exp(-sp.I*(z*k0))
+    elif dir == -1:
+        E0_vec = (Ax*r.i + Ay*r.j)*sp.exp(sp.I*(z*k0))
     return E0_vec * temporal_phase
+
+# Definimos una función que halle las amplitudes de entrada con respecto a las amplitudes de los 
+#Eigenmodos
+
+# def find_amplitudes(u,r,v1,v2,eav,del_av,n):
+
+#     w = 1j*(math.sqrt)
+
+
 
 # Definición en forma simbólica del operador rotacion S(theta)
 
