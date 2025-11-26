@@ -63,7 +63,7 @@ def N_(lam,type,dir):
 
 # Definimos con esta funcion los autovectores representativos como base
 # dependientes del valor que adopte n como entrada
-def A_0(n):
+def Aprime_0(n):
 
     A0_vec = ((1*r.i + -sp.I * (nx**2-n**2-(alf)**2)/(2*alf*n)*r.j)
                 *sp.exp(-sp.I*(z*k0*n)))

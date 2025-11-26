@@ -13,4 +13,4 @@ import math
 
 
 
-E_vec_in = fun.Evec(omega = 2*math.pi*fun.c/fun.lambda0, t)
+A_vec_in = fun.Evec(0,omega = 2*math.pi*fun.c/fun.lambda0)
