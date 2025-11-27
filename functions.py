@@ -83,9 +83,23 @@ def Evec(Ax,Ay,t,omega,dir):
 # Definimos una función que halle las amplitudes de entrada con respecto a las amplitudes de los 
 #Eigenmodos
 
-# def find_amplitudes(u,r,v1,v2,eav,del_av,n):
+def find_amplitudes(n_cnc,n_medium):
 
-#     w = 1j*(math.sqrt)
+    w = 1j*((epsilon_ab+delta_ab)-n_cnc**2-alf**2)/(2*alf*n_cnc)
+
+    u,r,v1,v2 = sp.symbols('u r v1 v2')
+
+    f1 = sp.Eq(u+r-v1-v2                                                ,0)
+    f2 = sp.Eq(-1j*u+1j*r-(-w*v1+w*v2)                                  ,0)
+    f3 = sp.Eq(-n_medium*u+n_medium*r - (-n_cnc*v1+n_cnc*v2)            ,0)
+    f4 = sp.Eq(-n_medium*u-n_medium*r - (1j*w*n_cnc*v1+1j*w*n_cnc*v2)   ,0)
+
+    sol = sp.solve((f1,f2,f3,f4),(u,r,v1,v2))
+    
+    return sol
+
+
+
 
 
 

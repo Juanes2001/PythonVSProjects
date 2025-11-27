@@ -13,7 +13,7 @@ import math
 
 
 
-Ax = sp.int(1)
+Ax = sp.Integer(1)
 Ay = -sp.I
 
 # Onda incidente y onda reflejada
@@ -21,4 +21,6 @@ E_vec_i = 1/math.sqrt(2)*fun.Evec(Ax,Ay,0,omega = 2*math.pi*fun.c/fun.lambda0,di
 E_vec_r = 1/math.sqrt(2)*fun.Evec(Ax,-Ay,0,omega = 2*math.pi*fun.c/fun.lambda0, dir = -1)
 
 # 
+
+print(fun.find_amplitudes(1.41,1))
 
