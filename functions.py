@@ -83,18 +83,73 @@ def Evec(Ax,Ay,t,omega,dir):
 # Definimos una función que halle las amplitudes de entrada con respecto a las amplitudes de los 
 #Eigenmodos
 
-def find_amplitudes(n_cnc,n_medium):
+def find_amplitudes_LCP_RCP(n_cnc,n_medium, width, pol):
 
     w = 1j*((epsilon_ab+delta_ab)-n_cnc**2-alf**2)/(2*alf*n_cnc)
 
-    u,r,v1,v2 = sp.symbols('u r v1 v2')
+    u,r,v1,v2,t = sp.symbols('u r v1 v2 t')
 
     f1 = sp.Eq(u+r                       ,v1 + v2)
     f2 = sp.Eq(u-r                       ,-1j*w*v1 + 1j*w*v2)
     
-    sol = sp.solve((f1,f2),(u,r))
+    sol1 = sp.solve((f1,f2),(u,r))
+
+    f3 = sp.Eq(v1*sp.exp(-sp.I*k0*n_cnc*width) + v2*sp.exp(sp.I*k0*n_cnc*width) 
+               ,t*sp.exp(-sp.I*k0*n_medium*width))
+        
+    f4 = sp.Eq( v1*w*sp.exp(-sp.I*k0*n_cnc*width) - v2*w*sp.exp(sp.I*k0*n_cnc*width) 
+               ,sp.I*t*sp.exp(-sp.I*k0*n_medium*width))
     
-    return sol
+    sol2 = sp.solve((f3,f4), (v1,v2))
+
+    rp = sol1[r].subs({v1: sol2[v1], v2: sol2[v2]})
+    up = sol1[u].subs({v1: sol2[v1], v2: sol2[v2]})
+
+    R = sp.simplify((sp.conjugate(rp/up) *(rp/up))**2)
+
+    return R
+
+#Definimos una funcion que halle las amplitudes de etrada con respecto a las aplitudes
+# de los eigenmodos, y con la luz de salida. para luz de entrada linealmente polarizada.
+
+def find_amplitudes_LinPol(n_cnc1,n_cnc2,n_medium, theta, width, pol):
+
+    w1 = 1j*((epsilon_ab+delta_ab)-n_cnc1**2-alf**2)/(2*alf*n_cnc1)
+    w2 = 1j*((epsilon_ab+delta_ab)-n_cnc2**2-alf**2)/(2*alf*n_cnc2)
+
+    u,r,v1,v2,v3,v4,t1 = sp.symbols('u r v1 v2 v3 v4 t1')
+    t2 = u/sp.sqrt(2) * sp.exp(-sp.I*theta)
+
+    f1 = sp.Eq(u*sp.cos(theta)+r*sp.cos(theta) ,1/math.sqrt(2)  * (v1 + v2 + v3 + v4))
+    f2 = sp.Eq(u*sp.sin(theta)-r*sp.sin(theta) ,1/math.sqrt(2)  * (-w2*v1 + w2*v2 + w1*v3 - w1*v4))
+    
+    sol1 = sp.solve((f1,f2),(u,r))
+
+    f3 = sp.Eq(v1*sp.exp(-sp.I*k0*n_cnc2*width) + v2*sp.exp(sp.I*k0*n_cnc2*width) +
+               v3*sp.exp(-sp.I*k0*n_cnc1*width) + v4*sp.exp(sp.I*k0*n_cnc1*width) 
+               ,(t1+t2)*sp.exp(-sp.I*k0*n_medium*width)  )
+        
+    f4 = sp.Eq(-w2*v1*sp.exp(-sp.I*k0*n_cnc2*width) + w2*v2*sp.exp(sp.I*k0*n_cnc2*width) +
+               w1*v3*sp.exp(-sp.I*k0*n_cnc1*width) - w1*v4*sp.exp(sp.I*k0*n_cnc1*width) 
+               ,(-t1+t2)*sp.I*sp.exp(-sp.I*k0*n_medium*width)  )
+    
+    f5 = sp.Eq(-n_cnc2*v1*sp.exp(-sp.I*k0*n_cnc2*width) + n_cnc2*v2*sp.exp(sp.I*k0*n_cnc2*width) -
+               n_cnc1*v3*sp.exp(-sp.I*k0*n_cnc1*width) + n_cnc1*v4*sp.exp(sp.I*k0*n_cnc1*width) 
+               ,-(t1+t2)*sp.I*k0*n_medium*sp.exp(-sp.I*k0*n_medium*width)  )
+    
+    f6 = sp.Eq(n_cnc2*w2*v1*sp.exp(-sp.I*k0*n_cnc2*width) + n_cnc2*w2*v2*sp.exp(sp.I*k0*n_cnc2*width) -
+               n_cnc1*w1*v3*sp.exp(-sp.I*k0*n_cnc1*width) - n_cnc1*w1*v4*sp.exp(sp.I*k0*n_cnc1*width) 
+               ,(-t1+t2)*k0*n_medium*sp.exp(-sp.I*k0*n_medium*width))
+    
+    sol2 = sp.solve((f3,f4,f5,f6), (v1,v2,v3,v4))
+
+    # rp = sol1[r].subs({v1: sol2[v1], v2: sol2[v2]})
+    # up = sol1[u].subs({v1: sol2[v1], v2: sol2[v2]})
+
+    # R = sp.simplify((sp.conjugate(rp/up) *(rp/up))**2)
+
+    return sp.simplify((sol2[v2] + sol2[v3])/(sol2[v1] + sol2[v4]))
+
 
 
 # Definición en forma simbólica del operador rotacion S(theta)

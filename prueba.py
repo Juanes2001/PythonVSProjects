@@ -1,7 +1,6 @@
 import functions as fun
 
 import sympy as sp
-
 import sympy.vector as vec
 from sympy.vector import CoordSys3D
 
@@ -11,6 +10,17 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import math
 
+
+lam = 500e-9
+k0 = 2*math.pi/lam
+nh = 1
+eav = 1.462**2
+del_av = 0.01*eav/2
+p = 500e-9
+alfa = lam/p
+n1 = math.sqrt(alfa**2 + eav + math.sqrt(del_av**2 + 4*eav*alfa**2))
+n2 = math.sqrt(alfa**2 + eav - math.sqrt(del_av**2 + 4*eav*alfa**2))
+h = 18e-3
 
 
 Ax = sp.Integer(1)
@@ -22,5 +32,6 @@ E_vec_r = 1/math.sqrt(2)*fun.Evec(Ax,-Ay,0,omega = 2*math.pi*fun.c/fun.lambda0, 
 
 # 
 
-print(fun.find_amplitudes(1.41,1))
+print(1-fun.find_amplitudes_LCP_RCP(n1,nh,h,"oelo"))
 
+print(fun.find_amplitudes_LinPol(n1,n2,nh,math.pi,h,"oelo"))
