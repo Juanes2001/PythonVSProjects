@@ -119,11 +119,7 @@ def find_amplitudes_LinPol(n_cnc1,n_cnc2,n_medium, theta, width, pol):
 
     u,r,v1,v2,v3,v4,t1 = sp.symbols('u r v1 v2 v3 v4 t1')
     t2 = u/sp.sqrt(2) * sp.exp(-sp.I*theta)
-
-    f1 = sp.Eq(u*sp.cos(theta)+r*sp.cos(theta) ,1/math.sqrt(2)  * (v1 + v2 + v3 + v4))
-    f2 = sp.Eq(u*sp.sin(theta)-r*sp.sin(theta) ,1/math.sqrt(2)  * (-w2*v1 + w2*v2 + w1*v3 - w1*v4))
     
-    sol1 = sp.solve((f1,f2),(u,r))
 
     f3 = sp.Eq(v1*sp.exp(-sp.I*k0*n_cnc2*width) + v2*sp.exp(sp.I*k0*n_cnc2*width) +
                v3*sp.exp(-sp.I*k0*n_cnc1*width) + v4*sp.exp(sp.I*k0*n_cnc1*width) 
@@ -143,12 +139,15 @@ def find_amplitudes_LinPol(n_cnc1,n_cnc2,n_medium, theta, width, pol):
     
     sol2 = sp.solve((f3,f4,f5,f6), (v1,v2,v3,v4))
 
-    # rp = sol1[r].subs({v1: sol2[v1], v2: sol2[v2]})
-    # up = sol1[u].subs({v1: sol2[v1], v2: sol2[v2]})
+    f1 = sp.Eq(u*sp.cos(theta)+r*sp.cos(theta) ,1/math.sqrt(2)  * (sol2[v1] + sol2[v2] + sol2[v3] + sol2[v4]))
+    f2 = sp.Eq(u*sp.sin(theta)-r*sp.sin(theta) ,1/math.sqrt(2)  * (-w2*sol2[v1] + w2*sol2[v2] + w1*sol2[v3] - w1*sol2[v4]))
+    
+    sol1 = sp.solve((f1,f2),(u,r))
 
-    # R = sp.simplify((sp.conjugate(rp/up) *(rp/up))**2)
 
-    return sp.simplify((sol2[v2] + sol2[v3])/(sol2[v1] + sol2[v4]))
+    R = sp.simplify((sp.conjugate(sol1[r]/sol1[u]) *(sol1[r]/sol1[u]))**2)
+
+    return R
 
 
 
