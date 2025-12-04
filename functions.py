@@ -83,36 +83,68 @@ def Evec(Ax,Ay,t,omega,dir):
 # Definimos una función que halle las amplitudes de entrada con respecto a las amplitudes de los 
 #Eigenmodos
 
-def find_amplitudes_LCP_RCP(n_cnc,n_medium, width, pol):
+def find_amplitudes_LCP_RCP(spectrum, n_medium, width, pitch,eav, del_av , pol):
 
-    w = 1j*((epsilon_ab+delta_ab)-n_cnc**2-alf**2)/(2*alf*n_cnc)
 
-    u,r,v1,v2,t = sp.symbols('u r v1 v2 t')
+    u,r,v1,v2,t,lam= sp.symbols('u r v1 v2 t lam')
 
-    f1 = sp.Eq(u+r                       ,v1 + v2)
-    f2 = sp.Eq(u-r                       ,-1j*w*v1 + 1j*w*v2)
-    
-    sol1 = sp.solve((f1,f2),(u,r))
+    n_cnc1 = sp.sqrt((lam/pitch)**2 + eav + sp.sqrt(del_av**2 + 4*eav*(lam/pitch)**2 + sp.I*0) + sp.I*0)
+    n_cnc2 = sp.sqrt((lam/pitch)**2 + eav + sp.sqrt(del_av**2 + 4*eav*(lam/pitch)**2 + sp.I*0) + sp.I*0)
 
-    f3 = sp.Eq(v1*sp.exp(-sp.I*k0*n_cnc*width) + v2*sp.exp(sp.I*k0*n_cnc*width) 
-               ,t*sp.exp(-sp.I*k0*n_medium*width))
+
+    if pol == "LCP":
         
-    f4 = sp.Eq( v1*w*sp.exp(-sp.I*k0*n_cnc*width) - v2*w*sp.exp(sp.I*k0*n_cnc*width) 
-               ,sp.I*t*sp.exp(-sp.I*k0*n_medium*width))
-    
-    sol2 = sp.solve((f3,f4), (v1,v2))
+        w = 1j*((epsilon_ab+delta_ab)-n_cnc2**2-alf**2)/(2*alf*n_cnc2)
 
+        f1 = sp.Eq(u+r                       ,v1 + v2)
+        f2 = sp.Eq(u-r                       ,-sp.I*w*v1 + sp.I*w*v2)
+        
+        sol1 = sp.solve((f1,f2),(u,r))
+
+        f3 = sp.Eq(v1*sp.exp(-sp.I*k0*n_cnc2*width) + v2*sp.exp(sp.I*k0*n_cnc2*width) 
+                ,t*sp.exp(-sp.I*k0*n_medium*width))
+            
+        f4 = sp.Eq( v1*w*sp.exp(-sp.I*k0*n_cnc2*width) - v2*w*sp.exp(sp.I*k0*n_cnc2*width) 
+                ,sp.I*t*sp.exp(-sp.I*k0*n_medium*width))
+        
+        sol2 = sp.solve((f3,f4), (v1,v2))
+    
+    elif pol == "RCP":
+
+        w = sp.I*((epsilon_ab+delta_ab)-n_cnc1**2-alf**2)/(2*alf*n_cnc1)
+
+        f1 = sp.Eq(u+r                       ,v1 + v2)
+        f2 = sp.Eq(u-r                       ,-sp.I*w*v1 + sp.I*w*v2)
+        
+        sol1 = sp.solve((f1,f2),(u,r))
+
+        f3 = sp.Eq(v1*sp.exp(-sp.I*k0*n_cnc1*width) + v2*sp.exp(sp.I*k0*n_cnc1*width) 
+                ,t*sp.exp(-sp.I*k0*n_medium*width))
+            
+        f4 = sp.Eq( v1*w*sp.exp(-sp.I*k0*n_cnc1*width) - v2*w*sp.exp(sp.I*k0*n_cnc1*width) 
+                ,sp.I*t*sp.exp(-sp.I*k0*n_medium*width))
+        
+        sol2 = sp.solve((f3,f4), (v1,v2))
+
+    
     rp = sol1[r].subs({v1: sol2[v1], v2: sol2[v2]})
     up = sol1[u].subs({v1: sol2[v1], v2: sol2[v2]})
 
     R = sp.simplify((sp.conjugate(rp/up) *(rp/up))**2)
 
-    return R
+    R = sp.lambdify((lam), R, "numpy")
+
+    Reflection = R(spectrum)
+
+    return Reflection
 
 #Definimos una funcion que halle las amplitudes de etrada con respecto a las aplitudes
 # de los eigenmodos, y con la luz de salida. para luz de entrada linealmente polarizada.
 
-def find_amplitudes_LinPol(n_cnc1,n_cnc2,n_medium, theta, width, pol):
+def find_amplitudes_LinPol(n_medium, theta, width, pol):
+
+    n_cnc1=
+    n_cnc2=
 
     w1 = 1j*((epsilon_ab+delta_ab)-n_cnc1**2-alf**2)/(2*alf*n_cnc1)
     w2 = 1j*((epsilon_ab+delta_ab)-n_cnc2**2-alf**2)/(2*alf*n_cnc2)
